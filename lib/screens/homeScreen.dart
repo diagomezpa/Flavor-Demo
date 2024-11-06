@@ -1,3 +1,7 @@
+import 'package:flavorbox/models/recipe.dart';
+import 'package:flavorbox/screens/detailScreen.dart';
+import 'package:flavorbox/services/databaseHelper.dart';
+import 'package:flavorbox/screens/formScreen.dart'; // Add this import
 import 'package:flutter/material.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -6,6 +10,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  late Future<List<Recipe>> _recipes;
   List<Widget> cards = [];
   int cardCount = 0;
 
@@ -13,9 +18,10 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     // Inicializar con 15 tarjetas
-    for (int i = 1; i <= 15; i++) {
-      cards.add(cardItem('Tarjeta $i', getColor(i)));
-    }
+    // for (int i = 1; i <= 15; i++) {
+    //   cards.add(cardItem('Tarjeta $i', getColor(i)));
+    // }
+    _recipes = DatabaseHelper.instance.fetchRecipes();
   }
 
   Color getColor(int index) {
@@ -53,60 +59,127 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         title: Text('Listado de Tarjetas'),
       ),
-      body: Stack(
-        children: [
-          Column(
-            children: [
-              Expanded(
-                flex: 8,
-                child: ListView(
-                  padding: EdgeInsets.all(15.0),
-                  children: cards,
+      body: FutureBuilder<List<Recipe>>(
+        future: _recipes,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text('No hay recetas disponibles'),
+                  SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: _addNewRecipe,
+                    child: Text('Agregar Nueva Receta'),
+                  ),
+                ],
+              ),
+            );
+          } else {
+            List<Recipe> recipes = snapshot.data!;
+            return Stack(
+              children: [
+                Column(
+                  children: [
+                    Expanded(
+                      flex: 8,
+                      child: ListView.builder(
+                        padding: EdgeInsets.all(15.0),
+                        itemCount: recipes.length,
+                        itemBuilder: (context, index) {
+                          return cardItem(
+                              recipes[index].name, getColor(index + 1));
+                        },
+                      ),
+                    ),
+                    Container(
+                      height: 40.0, // Espacio para el botón
+                    ),
+                  ],
                 ),
-              ),
-              Container(
-                height: 40.0, // Espacio para el botón
-              ),
-            ],
-          ),
-          Positioned(
-            bottom: 15,
-            right: 0,
-            left: 0,
-            child: Center(
-              child: ElevatedButton(
-                onPressed: addCard,
-                child: const Text(
-                  'Nueva tarjeta',
-                  style: TextStyle(fontSize: 20),
+                Positioned(
+                  bottom: 15,
+                  right: 0,
+                  left: 0,
+                  child: Center(
+                    child: ElevatedButton(
+                      onPressed: _addNewRecipe,
+                      child: const Text(
+                        'Nueva tarjeta',
+                        style: TextStyle(fontSize: 20),
+                      ),
+                    ),
+                  ),
                 ),
-              ),
-            ),
-          ),
-        ],
+              ],
+            );
+          }
+        },
       ),
     );
   }
 
-  Widget cardItem(String title, Color color) {
-    return Card(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10.0),
+  void _addNewRecipe() async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => FormScreen(
+          ingredients: [],
+          description: '',
+        ),
       ),
-      child: Container(
-        width: double.infinity,
-        height: 150.0, // Aumentar la altura de la tarjeta
-        margin: EdgeInsets.symmetric(vertical: 0.0),
-        decoration: BoxDecoration(
-          color: color,
+    );
+
+    if (result != null) {
+      final dbHelper = DatabaseHelper.instance;
+      await dbHelper.insertRecipe(Recipe(
+        id: DateTime.now().millisecondsSinceEpoch,
+        name: result['name'],
+        ingredients: result['ingredients'],
+        description: result['description'],
+      ));
+      setState(() {
+        setState(() {
+          _recipes = DatabaseHelper.instance.fetchRecipes();
+        });
+      });
+    }
+  }
+
+  Widget cardItem(String title, Color color) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => Detailscreen(),
+          ),
+        );
+      },
+      child: Card(
+        shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10.0),
         ),
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Center(
-            child: Text(
-              title,
-              style: TextStyle(fontSize: 24.0, color: Colors.white),
+        child: Container(
+          width: double.infinity,
+          height: 150.0, // Aumentar la altura de la tarjeta
+          margin: EdgeInsets.symmetric(vertical: 0.0),
+          decoration: BoxDecoration(
+            color: color,
+            borderRadius: BorderRadius.circular(10.0),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Center(
+              child: Text(
+                title,
+                style: TextStyle(fontSize: 24.0, color: Colors.white),
+              ),
             ),
           ),
         ),
