@@ -27,14 +27,20 @@ FlavorBox es una aplicación Flutter diseñada para gestionar recetas. Los usuar
 ## Consideraciones Importantes
 
 1. **Inicialización de la Base de Datos**: La base de datos se inicializa de manera perezosa cuando se accede por primera vez. La clase `DatabaseHelper` asegura que se use una única instancia de la base de datos en toda la aplicación.
+
+
 2. **Gestión del Estado**: El estado de la lista de recetas se gestiona usando `FutureBuilder` en la `HomeScreen`. Cuando se agrega o elimina una receta, el estado se actualiza para reflejar los cambios.
 3. **Navegación**: La navegación entre pantallas se maneja usando `Navigator.push` y `Navigator.pop`. Los datos se pasan entre pantallas usando el mecanismo de resultado del `Navigator`.
 4. **Gestión de Ingredientes**: Los ingredientes se gestionan como una lista de cadenas. Se muestran en una lista horizontal y se pueden agregar, editar o eliminar usando diálogos.
 
 ## Uso
+![homeScreenListado](assets/listado.jpeg)
 
+![Formaulario](assets/agregar_receta.jpeg)
 1. **Agregar una Receta**: Toca el botón "Agregar Nueva Receta" en la `HomeScreen` para navegar a la `FormScreen`. Llena los detalles y guarda.
+![homeScreen](assets/sin_receta.jpeg)
 2. **Ver Detalles de la Receta**: Toca una tarjeta de receta en la `HomeScreen` para navegar a la `DetailScreen`.
+![Detalles](assets/detalle.jpeg)
 3. **Editar una Receta**: En la `DetailScreen`, toca el botón "Editar" para navegar a la `FormScreen` con detalles prellenados.
 4. **Eliminar una Receta**: En la `DetailScreen`, toca el botón "Eliminar" para eliminar la receta y regresar a la `HomeScreen`.
 
@@ -42,9 +48,3 @@ FlavorBox es una aplicación Flutter diseñada para gestionar recetas. Los usuar
 
 - `sqflite`: Para operaciones de base de datos SQLite.
 - `path`: Para manejar rutas de archivos.
-
-## Mejoras Futuras
-
-- Agregar autenticación de usuario para gestionar colecciones personales de recetas.
-- Implementar funcionalidad de búsqueda para encontrar recetas rápidamente.
-- Mejorar la interfaz de usuario con más elementos interactivos y animaciones.

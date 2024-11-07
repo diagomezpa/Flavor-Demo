@@ -54,7 +54,13 @@ class _HomeScreenState extends State<HomeScreen> {
                   SizedBox(height: 20),
                   ElevatedButton(
                     onPressed: _addNewRecipe,
-                    child: Text('Agregar Nueva Receta'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.teal,
+                    ),
+                    child: Text(
+                      'Agregar Nueva Receta',
+                      style: TextStyle(fontSize: 20, color: Colors.black),
+                    ),
                   ),
                 ],
               ),
