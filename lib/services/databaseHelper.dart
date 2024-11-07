@@ -55,6 +55,15 @@ class DatabaseHelper {
     return result.map((json) => Recipe.fromMap(json)).toList();
   }
 
+  Future<void> deleteRecipe(int id) async {
+    final db = await database;
+    await db.delete(
+      'recipes',
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+  }
+
   Future<void> close() async {
     final db = await instance.database;
 

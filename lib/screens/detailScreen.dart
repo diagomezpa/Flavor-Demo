@@ -2,25 +2,34 @@ import 'package:flutter/material.dart';
 import 'formScreen.dart'; // Importa la pantalla de formulario
 
 class Detailscreen extends StatefulWidget {
-  const Detailscreen({super.key});
+  final String name;
+  final List<String> ingredients;
+  final String description;
+  final int id;
+  final Function(int) onDelete;
+
+  Detailscreen({
+    required this.id,
+    required this.name,
+    required this.ingredients,
+    required this.description,
+    required this.onDelete,
+  });
 
   @override
   State<Detailscreen> createState() => _DetailscreenState();
 }
 
 class _DetailscreenState extends State<Detailscreen> {
-  final List<String> ingredients = [
-    'Matcha Powder',
-    'Milk',
-    'Ice',
-    'Sugar',
-    'Whipped Cream'
-  ];
+  late TextEditingController _descriptionController;
+  late TextEditingController _nameController;
 
-  final TextEditingController _descriptionController = TextEditingController(
-    text:
-        'El matcha es un tipo de té verde en polvo que se cultiva y procesa en Japón. A diferencia de las hojas de té verde que se infusionan en agua caliente y luego se eliminan, el polvo de matcha se mezcla con agua o leche, por lo que se consume en su totalidad.',
-  );
+  @override
+  void initState() {
+    super.initState();
+    _descriptionController = TextEditingController(text: widget.description);
+    _nameController = TextEditingController(text: widget.name);
+  }
 
   void _showIngredientDialog({String? ingredient}) {
     final TextEditingController ingredientController = TextEditingController(
@@ -49,11 +58,11 @@ class _DetailscreenState extends State<Detailscreen> {
               onPressed: () {
                 setState(() {
                   if (ingredient == null) {
-                    ingredients.add(ingredientController.text);
+                    widget.ingredients.add(ingredientController.text);
                   } else {
-                    int index = ingredients.indexOf(ingredient);
+                    int index = widget.ingredients.indexOf(ingredient);
                     if (index != -1) {
-                      ingredients[index] = ingredientController.text;
+                      widget.ingredients[index] = ingredientController.text;
                     }
                   }
                 });
@@ -71,7 +80,7 @@ class _DetailscreenState extends State<Detailscreen> {
     final result = await Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => FormScreen(
-          ingredients: ingredients,
+          ingredients: widget.ingredients,
           description: _descriptionController.text,
         ),
       ),
@@ -79,7 +88,7 @@ class _DetailscreenState extends State<Detailscreen> {
 
     if (result != null) {
       setState(() {
-        ingredients
+        widget.ingredients
           ..clear()
           ..addAll(result['ingredients']);
         _descriptionController.text = result['description'];
@@ -116,6 +125,32 @@ class _DetailscreenState extends State<Detailscreen> {
                   child: Column(
                     children: [
                       Text(
+                        'Nombre de la Receta',
+                        style: TextStyle(
+                          fontSize: 24.0,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      SizedBox(height: 10),
+                      Text(
+                        _nameController.text,
+                        style: TextStyle(fontSize: 16),
+                      ),
+                      SizedBox(height: 20),
+                      Text(
+                        'Descripción',
+                        style: TextStyle(
+                          fontSize: 24.0,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      SizedBox(height: 10),
+                      Text(
+                        _descriptionController.text,
+                        style: TextStyle(fontSize: 16),
+                      ),
+                      SizedBox(height: 20),
+                      Text(
                         'Ingredientes',
                         style: TextStyle(
                           fontSize: 24.0,
@@ -127,7 +162,7 @@ class _DetailscreenState extends State<Detailscreen> {
                         child: ListView(
                           scrollDirection: Axis.horizontal,
                           children: [
-                            ...ingredients
+                            ...widget.ingredients
                                 .map((ingredient) => GestureDetector(
                                       onTap: () {
                                         _showIngredientDialog(
@@ -149,19 +184,6 @@ class _DetailscreenState extends State<Detailscreen> {
                           ],
                         ),
                       ),
-                      SizedBox(height: 20),
-                      Text(
-                        'Descripción',
-                        style: TextStyle(
-                          fontSize: 24.0,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      SizedBox(height: 10),
-                      Text(
-                        _descriptionController.text,
-                        style: TextStyle(fontSize: 16),
-                      ),
                     ],
                   ),
                 ),
@@ -180,12 +202,13 @@ class _DetailscreenState extends State<Detailscreen> {
               label: Text('Editar'),
             ),
             ElevatedButton.icon(
-              onPressed: null,
+              onPressed: () {
+                widget.onDelete(widget.id);
+                Navigator.pop(context);
+              },
               icon: Icon(Icons.delete),
               label: Text('Eliminar'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red,
-              ),
+              style: ElevatedButton.styleFrom(),
             ),
           ],
         ),

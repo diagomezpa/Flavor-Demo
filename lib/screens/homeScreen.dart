@@ -45,19 +45,11 @@ class _HomeScreenState extends State<HomeScreen> {
     return colors[(index - 1) % colors.length];
   }
 
-  void addCard() {
-    setState(() {
-      cardCount++;
-      cards.add(
-          cardItem('Tarjeta ${cards.length + 1}', getColor(cards.length + 1)));
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Listado de Tarjetas'),
+        title: Text('Listado de Recetas'),
       ),
       body: FutureBuilder<List<Recipe>>(
         future: _recipes,
@@ -92,8 +84,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         padding: EdgeInsets.all(15.0),
                         itemCount: recipes.length,
                         itemBuilder: (context, index) {
-                          return cardItem(
-                              recipes[index].name, getColor(index + 1));
+                          return cardItem(recipes[index], getColor(index + 1));
                         },
                       ),
                     ),
@@ -151,13 +142,27 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  Widget cardItem(String title, Color color) {
+  void _deleteRecipe(int id) async {
+    final dbHelper = DatabaseHelper.instance;
+    await dbHelper.deleteRecipe(id);
+    setState(() {
+      _recipes = DatabaseHelper.instance.fetchRecipes();
+    });
+  }
+
+  Widget cardItem(Recipe recipe, Color color) {
     return GestureDetector(
       onTap: () {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => Detailscreen(),
+            builder: (context) => Detailscreen(
+              id: recipe.id!,
+              name: recipe.name,
+              ingredients: recipe.ingredients,
+              description: recipe.description,
+              onDelete: _deleteRecipe,
+            ),
           ),
         );
       },
@@ -177,7 +182,7 @@ class _HomeScreenState extends State<HomeScreen> {
             padding: const EdgeInsets.all(16.0),
             child: Center(
               child: Text(
-                title,
+                recipe.name,
                 style: TextStyle(fontSize: 24.0, color: Colors.white),
               ),
             ),
