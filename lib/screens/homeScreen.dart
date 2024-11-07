@@ -26,21 +26,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Color getColor(int index) {
     List<Color> colors = [
-      Colors.red,
-      Colors.blue,
-      Colors.green,
-      Colors.yellow,
-      Colors.orange,
-      Colors.purple,
-      Colors.cyan,
-      Colors.pink,
       Colors.teal,
-      Colors.lime,
-      Colors.indigo,
-      Colors.brown,
-      Colors.grey,
-      Colors.amber,
-      Colors.deepOrange,
     ];
     return colors[(index - 1) % colors.length];
   }
@@ -50,6 +36,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Listado de Recetas'),
+        backgroundColor: Colors.teal,
       ),
       body: FutureBuilder<List<Recipe>>(
         future: _recipes,
@@ -100,9 +87,15 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: Center(
                     child: ElevatedButton(
                       onPressed: _addNewRecipe,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.teal,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10.0),
+                        ),
+                      ),
                       child: const Text(
                         'Nueva tarjeta',
-                        style: TextStyle(fontSize: 20),
+                        style: TextStyle(fontSize: 20, color: Colors.black),
                       ),
                     ),
                   ),
@@ -173,10 +166,17 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Container(
           width: double.infinity,
           height: 150.0, // Aumentar la altura de la tarjeta
-          margin: EdgeInsets.symmetric(vertical: 0.0),
+          margin: EdgeInsets.symmetric(vertical: 10.0),
           decoration: BoxDecoration(
-            color: color,
+            color: color.withOpacity(0.8),
             borderRadius: BorderRadius.circular(10.0),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black26,
+                blurRadius: 5,
+                offset: Offset(0, 3),
+              ),
+            ],
           ),
           child: Padding(
             padding: const EdgeInsets.all(16.0),

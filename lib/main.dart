@@ -13,6 +13,14 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flavor Demo',
+      theme: ThemeData(
+        primarySwatch: Colors.teal,
+        visualDensity: VisualDensity.adaptivePlatformDensity,
+        textTheme: TextTheme(
+          headlineLarge: TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold),
+          bodyLarge: TextStyle(fontSize: 16.0),
+        ),
+      ),
       home: HomeScreen(),
     );
   }

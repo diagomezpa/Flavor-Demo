@@ -174,10 +174,10 @@ class _DetailscreenState extends State<Detailscreen> {
                             GestureDetector(
                               onTap: _showIngredientDialog,
                               child: Card(
-                                color: Colors.green,
+                                color: Colors.teal,
                                 child: Padding(
                                   padding: const EdgeInsets.all(8.0),
-                                  child: Icon(Icons.add),
+                                  child: Icon(Icons.add, color: Colors.white),
                                 ),
                               ),
                             ),
@@ -198,17 +198,29 @@ class _DetailscreenState extends State<Detailscreen> {
           children: [
             ElevatedButton.icon(
               onPressed: _editDetails,
-              icon: Icon(Icons.edit),
-              label: Text('Editar'),
+              icon: Icon(Icons.edit, color: Colors.black),
+              label: Text(
+                'Editar',
+                style: TextStyle(fontSize: 20, color: Colors.black),
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.teal,
+              ),
             ),
+            SizedBox(height: 16), // Espacio vertical
             ElevatedButton.icon(
               onPressed: () {
                 widget.onDelete(widget.id);
                 Navigator.pop(context);
               },
-              icon: Icon(Icons.delete),
-              label: Text('Eliminar'),
-              style: ElevatedButton.styleFrom(),
+              icon: Icon(Icons.delete, color: Colors.black),
+              label: Text(
+                'Eliminar',
+                style: TextStyle(fontSize: 20, color: Colors.black),
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.teal,
+              ),
             ),
           ],
         ),
@@ -242,7 +254,7 @@ class IngredientCard extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.fastfood, size: 30, color: Colors.green),
+          Icon(Icons.fastfood, size: 30, color: Colors.teal),
           SizedBox(height: 5),
           Text(
             name,

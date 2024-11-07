@@ -76,73 +76,79 @@ class _FormScreenState extends State<FormScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Editar Detalles'),
+        backgroundColor: Colors.teal,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Nombre',
-              style: TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold),
-            ),
-            TextField(
-              controller: _nameController,
-              decoration: InputDecoration(
-                hintText: 'Ingrese el nombre de la receta',
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Nombre',
+                style: TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold),
               ),
-            ),
-            Text(
-              'Descripción',
-              style: TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold),
-            ),
-            TextField(
-              controller: _descriptionController,
-              maxLines: 5,
-              decoration: InputDecoration(
-                hintText: 'Ingrese la descripción',
+              TextField(
+                controller: _nameController,
+                decoration: InputDecoration(
+                  hintText: 'Ingrese el nombre de la receta',
+                ),
               ),
-            ),
-            SizedBox(height: 20),
-            Text(
-              'Ingredientes',
-              style: TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(
-              height: 120,
-              child: ListView(
-                scrollDirection: Axis.horizontal,
-                children: [
-                  ..._ingredients.asMap().entries.map((entry) {
-                    int index = entry.key;
-                    String ingredient = entry.value;
-                    return GestureDetector(
+              SizedBox(height: 16),
+              Text(
+                'Descripción',
+                style: TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold),
+              ),
+              TextField(
+                controller: _descriptionController,
+                maxLines: 5,
+                decoration: InputDecoration(
+                  hintText: 'Ingrese la descripción',
+                ),
+              ),
+              SizedBox(height: 20),
+              Text(
+                'Ingredientes',
+                style: TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold),
+              ),
+              SizedBox(
+                height: 120,
+                child: ListView(
+                  scrollDirection: Axis.horizontal,
+                  children: [
+                    ..._ingredients.asMap().entries.map((entry) {
+                      int index = entry.key;
+                      String ingredient = entry.value;
+                      return GestureDetector(
+                        onTap: () {
+                          _showIngredientDialog(
+                              ingredient: ingredient, index: index);
+                        },
+                        child: IngredientCard(
+                          name: ingredient,
+                          onDelete: () => _removeIngredient(index),
+                        ),
+                      );
+                    }).toList(),
+                    GestureDetector(
                       onTap: () {
-                        _showIngredientDialog(
-                            ingredient: ingredient, index: index);
+                        _showIngredientDialog();
                       },
-                      child: IngredientCard(
-                        name: ingredient,
-                        onDelete: () => _removeIngredient(index),
-                      ),
-                    );
-                  }).toList(),
-                  GestureDetector(
-                    onTap: () {
-                      _showIngredientDialog();
-                    },
-                    child: Card(
-                      color: Colors.green,
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Icon(Icons.add),
+                      child: Card(
+                        color: Colors.teal,
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Icon(Icons.add, color: Colors.white),
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                    SizedBox(height: 16), // Espacio vertical
+                  ],
+                ),
               ),
-            ),
-          ],
+              SizedBox(height: 16), // Espacio vertical
+            ],
+          ),
         ),
       ),
       floatingActionButton: FloatingActionButton(
@@ -153,7 +159,8 @@ class _FormScreenState extends State<FormScreen> {
             'description': _descriptionController.text,
           });
         },
-        child: Icon(Icons.save),
+        backgroundColor: Colors.teal,
+        child: Icon(Icons.save, color: Colors.black),
       ),
     );
   }
@@ -188,14 +195,14 @@ class IngredientCard extends StatelessWidget {
             alignment: Alignment.topRight,
             child: GestureDetector(
               onTap: onDelete,
-              child: Icon(Icons.close, size: 20, color: Colors.green),
+              child: Icon(Icons.close, size: 20, color: Colors.teal),
             ),
           ),
           Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.fastfood, size: 30, color: Colors.green),
+                Icon(Icons.fastfood, size: 30, color: Colors.teal),
                 SizedBox(height: 5),
                 Text(
                   name,
