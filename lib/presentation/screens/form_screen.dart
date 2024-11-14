@@ -31,9 +31,8 @@ class _FormScreenState extends State<FormScreen> {
   }
 
   void _showIngredientDialog({String? ingredient, int? index}) {
-    final TextEditingController ingredientController = TextEditingController(
-      text: ingredient ?? '',
-    );
+    final _ingredientFormKey = GlobalKey<FormState>();
+    final _ingredientDialogController = TextEditingController(text: ingredient);
 
     showDialog(
       context: context,
@@ -42,9 +41,18 @@ class _FormScreenState extends State<FormScreen> {
           title: Text(ingredient == null
               ? 'Agregar Ingrediente'
               : 'Editar Ingrediente'),
-          content: TextField(
-            controller: ingredientController,
-            decoration: InputDecoration(hintText: 'Ingrese el ingrediente'),
+          content: Form(
+            key: _ingredientFormKey,
+            child: TextFormField(
+              controller: _ingredientDialogController,
+              decoration: InputDecoration(hintText: 'Ingrese el ingrediente'),
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'El ingrediente no puede estar vacío';
+                }
+                return null;
+              },
+            ),
           ),
           actions: [
             TextButton(
@@ -55,14 +63,16 @@ class _FormScreenState extends State<FormScreen> {
             ),
             TextButton(
               onPressed: () {
-                setState(() {
-                  if (ingredient == null) {
-                    _ingredients.add(ingredientController.text);
-                  } else if (index != null) {
-                    _ingredients[index] = ingredientController.text;
-                  }
-                });
-                Navigator.of(context).pop();
+                if (_ingredientFormKey.currentState!.validate()) {
+                  setState(() {
+                    if (ingredient == null) {
+                      _ingredients.add(_ingredientDialogController.text);
+                    } else if (index != null) {
+                      _ingredients[index] = _ingredientDialogController.text;
+                    }
+                  });
+                  Navigator.of(context).pop();
+                }
               },
               child: Text(ingredient == null ? 'Agregar' : 'Guardar'),
             ),

@@ -101,6 +101,10 @@ class _DetailscreenState extends State<Detailscreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Text('Detalles de la Receta'),
+        backgroundColor: Colors.teal,
+      ),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(0.0),
