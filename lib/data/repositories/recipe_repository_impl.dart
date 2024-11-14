@@ -1,16 +1,16 @@
 import 'package:flavorbox/data/models/recipe_model.dart';
-import 'package:flavorbox/data/services/databaseHelper.dart';
+import 'package:flavorbox/data/services/json_service.dart';
 import 'package:flavorbox/domain/entities/recipe.dart';
 import 'package:flavorbox/domain/repositories/recipe_repository.dart';
 
 class RecipeRepositoryImpl implements RecipeRepository {
-  final DatabaseHelper databaseHelper;
+  final JsonService jsonService;
 
-  RecipeRepositoryImpl(this.databaseHelper);
+  RecipeRepositoryImpl(this.jsonService);
 
   @override
   Future<List<Recipe>> getRecipes() async {
-    final recipes = await databaseHelper.fetchRecipes();
+    final recipes = await jsonService.fetchRecipes();
     return recipes;
   }
 
@@ -22,11 +22,11 @@ class RecipeRepositoryImpl implements RecipeRepository {
       ingredients: recipe.ingredients,
       description: recipe.description,
     );
-    await databaseHelper.insertRecipe(recipeModel);
+    await jsonService.insertRecipe(recipeModel);
   }
 
   @override
   Future<void> deleteRecipe(int id) async {
-    await databaseHelper.deleteRecipe(id);
+    await jsonService.deleteRecipe(id);
   }
 }

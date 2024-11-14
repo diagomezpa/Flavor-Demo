@@ -4,9 +4,10 @@ import 'package:flavorbox/domain/usecases/add_recipe.dart';
 import 'package:flavorbox/domain/usecases/delete_recipe.dart';
 import 'package:flavorbox/domain/usecases/get_recipes.dart';
 import 'package:flavorbox/presentation/screens/detail_screen.dart';
-import 'package:flavorbox/data/services/databaseHelper.dart';
 import 'package:flavorbox/presentation/screens/form_screen.dart'; // Add this import
 import 'package:flutter/material.dart';
+
+import '../../data/services/json_service.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -27,7 +28,7 @@ class _HomeScreenState extends State<HomeScreen> {
     // for (int i = 1; i <= 15; i++) {
     //   cards.add(cardItem('Tarjeta $i', getColor(i)));
     // }
-    final repository = RecipeRepositoryImpl(DatabaseHelper.instance);
+    final repository = RecipeRepositoryImpl(JsonService());
     final getRecipes = GetRecipes(repository);
     addRecipe = AddRecipe(repository);
     deleteRecipe = DeleteRecipe(repository);
@@ -144,8 +145,7 @@ class _HomeScreenState extends State<HomeScreen> {
       );
       await addRecipe.call(newRecipe);
       setState(() {
-        _recipes =
-            GetRecipes(RecipeRepositoryImpl(DatabaseHelper.instance)).call();
+        _recipes = GetRecipes(RecipeRepositoryImpl(JsonService())).call();
       });
     }
   }
@@ -153,8 +153,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> _deleteRecipe(int id) async {
     await deleteRecipe.call(id);
     setState(() {
-      _recipes =
-          GetRecipes(RecipeRepositoryImpl(DatabaseHelper.instance)).call();
+      _recipes = GetRecipes(RecipeRepositoryImpl(JsonService())).call();
     });
   }
 
