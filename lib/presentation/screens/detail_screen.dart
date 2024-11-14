@@ -81,6 +81,7 @@ class _DetailscreenState extends State<Detailscreen> {
     final result = await Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => FormScreen(
+          name: _nameController.text,
           ingredients: widget.ingredients,
           description: _descriptionController.text,
         ),

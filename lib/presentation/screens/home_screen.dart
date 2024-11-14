@@ -132,6 +132,7 @@ class _HomeScreenState extends State<HomeScreen> {
         builder: (context) => FormScreen(
           ingredients: [],
           description: '',
+          name: '',
         ),
       ),
     );
