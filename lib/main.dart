@@ -1,4 +1,4 @@
-import 'package:flavorbox/screens/homeScreen.dart';
+import 'package:flavorbox/presentation/screens/home_screen.dart';
 import 'package:flutter/material.dart';
 
 void main() {

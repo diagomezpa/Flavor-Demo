@@ -1,4 +1,4 @@
-import 'package:flavorbox/models/recipe.dart';
+import 'package:flavorbox/data/models/recipe_model.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
@@ -37,7 +37,7 @@ class DatabaseHelper {
     ''');
   }
 
-  Future<void> insertRecipe(Recipe recipe) async {
+  Future<void> insertRecipe(RecipeModel recipe) async {
     final db = await instance.database;
 
     await db.insert(
@@ -47,12 +47,12 @@ class DatabaseHelper {
     );
   }
 
-  Future<List<Recipe>> fetchRecipes() async {
+  Future<List<RecipeModel>> fetchRecipes() async {
     final db = await instance.database;
 
     final result = await db.query('recipes');
 
-    return result.map((json) => Recipe.fromMap(json)).toList();
+    return result.map((json) => RecipeModel.fromMap(json)).toList();
   }
 
   Future<void> deleteRecipe(int id) async {

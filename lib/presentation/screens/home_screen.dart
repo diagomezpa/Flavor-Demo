@@ -1,7 +1,11 @@
-import 'package:flavorbox/models/recipe.dart';
-import 'package:flavorbox/screens/detailScreen.dart';
-import 'package:flavorbox/services/databaseHelper.dart';
-import 'package:flavorbox/screens/formScreen.dart'; // Add this import
+import 'package:flavorbox/data/repositories/recipe_repository_impl.dart';
+import 'package:flavorbox/domain/entities/recipe.dart';
+import 'package:flavorbox/domain/usecases/add_recipe.dart';
+import 'package:flavorbox/domain/usecases/delete_recipe.dart';
+import 'package:flavorbox/domain/usecases/get_recipes.dart';
+import 'package:flavorbox/presentation/screens/detail_screen.dart';
+import 'package:flavorbox/data/services/databaseHelper.dart';
+import 'package:flavorbox/presentation/screens/form_screen.dart'; // Add this import
 import 'package:flutter/material.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -13,6 +17,8 @@ class _HomeScreenState extends State<HomeScreen> {
   late Future<List<Recipe>> _recipes;
   List<Widget> cards = [];
   int cardCount = 0;
+  late AddRecipe addRecipe;
+  late DeleteRecipe deleteRecipe;
 
   @override
   void initState() {
@@ -21,7 +27,11 @@ class _HomeScreenState extends State<HomeScreen> {
     // for (int i = 1; i <= 15; i++) {
     //   cards.add(cardItem('Tarjeta $i', getColor(i)));
     // }
-    _recipes = DatabaseHelper.instance.fetchRecipes();
+    final repository = RecipeRepositoryImpl(DatabaseHelper.instance);
+    final getRecipes = GetRecipes(repository);
+    addRecipe = AddRecipe(repository);
+    deleteRecipe = DeleteRecipe(repository);
+    _recipes = getRecipes.call();
   }
 
   Color getColor(int index) {
@@ -114,7 +124,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  void _addNewRecipe() async {
+  Future<void> _addNewRecipe() async {
     final result = await Navigator.push(
       context,
       MaterialPageRoute(
@@ -126,26 +136,25 @@ class _HomeScreenState extends State<HomeScreen> {
     );
 
     if (result != null) {
-      final dbHelper = DatabaseHelper.instance;
-      await dbHelper.insertRecipe(Recipe(
+      final newRecipe = Recipe(
         id: DateTime.now().millisecondsSinceEpoch,
         name: result['name'],
         ingredients: result['ingredients'],
         description: result['description'],
-      ));
+      );
+      await addRecipe.call(newRecipe);
       setState(() {
-        setState(() {
-          _recipes = DatabaseHelper.instance.fetchRecipes();
-        });
+        _recipes =
+            GetRecipes(RecipeRepositoryImpl(DatabaseHelper.instance)).call();
       });
     }
   }
 
-  void _deleteRecipe(int id) async {
-    final dbHelper = DatabaseHelper.instance;
-    await dbHelper.deleteRecipe(id);
+  Future<void> _deleteRecipe(int id) async {
+    await deleteRecipe.call(id);
     setState(() {
-      _recipes = DatabaseHelper.instance.fetchRecipes();
+      _recipes =
+          GetRecipes(RecipeRepositoryImpl(DatabaseHelper.instance)).call();
     });
   }
 

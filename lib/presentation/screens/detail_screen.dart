@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'formScreen.dart'; // Importa la pantalla de formulario
+import 'form_screen.dart'; // Importa la pantalla de formulario
+import 'package:flavorbox/presentation/widgets/ingredient_card.dart';
 
 class Detailscreen extends StatefulWidget {
   final String name;
@@ -224,47 +225,6 @@ class _DetailscreenState extends State<Detailscreen> {
             ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class IngredientCard extends StatelessWidget {
-  final String name;
-
-  IngredientCard({required this.name});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 120,
-      margin: EdgeInsets.only(right: 10),
-      padding: EdgeInsets.all(10),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(10),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.3),
-            blurRadius: 5,
-            offset: Offset(0, 3),
-          ),
-        ],
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.fastfood, size: 30, color: Colors.teal),
-          SizedBox(height: 5),
-          Text(
-            name,
-            style: TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.bold,
-            ),
-            textAlign: TextAlign.center,
-          ),
-        ],
       ),
     );
   }
