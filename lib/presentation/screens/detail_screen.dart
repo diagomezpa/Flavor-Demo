@@ -1,3 +1,6 @@
+import 'package:flavorbox/data/repositories/recipe_repository_impl.dart';
+import 'package:flavorbox/data/services/json_service.dart';
+import 'package:flavorbox/domain/usecases/delete_recipe.dart';
 import 'package:flutter/material.dart';
 import 'form_screen.dart'; // Importa la pantalla de formulario
 import 'package:flavorbox/presentation/widgets/ingredient_card.dart';
@@ -7,14 +10,12 @@ class Detailscreen extends StatefulWidget {
   final List<String> ingredients;
   final String description;
   final int id;
-  final Function(int) onDelete;
 
   Detailscreen({
     required this.id,
     required this.name,
     required this.ingredients,
     required this.description,
-    required this.onDelete,
   });
 
   @override
@@ -25,11 +26,21 @@ class _DetailscreenState extends State<Detailscreen> {
   late TextEditingController _descriptionController;
   late TextEditingController _nameController;
 
+  late RecipeRepositoryImpl repository;
+  late DeleteRecipe deleteRecipe;
+
   @override
   void initState() {
     super.initState();
     _descriptionController = TextEditingController(text: widget.description);
     _nameController = TextEditingController(text: widget.name);
+    repository = RecipeRepositoryImpl(JsonService());
+    deleteRecipe = DeleteRecipe(repository);
+  }
+
+  Future<void> _handleDelete() async {
+    // Llama al caso de uso de eliminación
+    await deleteRecipe.call(widget.id);
   }
 
   void _showIngredientDialog({String? ingredient}) {
@@ -81,6 +92,7 @@ class _DetailscreenState extends State<Detailscreen> {
     final result = await Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => FormScreen(
+          id: widget.id,
           name: _nameController.text,
           ingredients: widget.ingredients,
           description: _descriptionController.text,
@@ -94,6 +106,7 @@ class _DetailscreenState extends State<Detailscreen> {
           ..clear()
           ..addAll(result['ingredients']);
         _descriptionController.text = result['description'];
+        _nameController.text = result['name'];
       });
     }
   }
@@ -104,6 +117,13 @@ class _DetailscreenState extends State<Detailscreen> {
       appBar: AppBar(
         title: Text('Detalles de la Receta'),
         backgroundColor: Colors.teal,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pop(context,
+                true); // Devuelve true cuando se presiona la flecha de regreso
+          },
+        ),
       ),
       body: SafeArea(
         child: Padding(
@@ -216,7 +236,7 @@ class _DetailscreenState extends State<Detailscreen> {
             SizedBox(height: 16), // Espacio vertical
             ElevatedButton.icon(
               onPressed: () {
-                widget.onDelete(widget.id);
+                _handleDelete();
                 Navigator.pop(context);
               },
               icon: Icon(Icons.delete, color: Colors.black),

@@ -1,38 +1,38 @@
-import 'package:flavorbox/data/repositories/recipe_repository_impl.dart';
 import 'package:flavorbox/domain/entities/recipe.dart';
 import 'package:flavorbox/domain/usecases/add_recipe.dart';
 import 'package:flavorbox/domain/usecases/delete_recipe.dart';
 import 'package:flavorbox/domain/usecases/get_recipes.dart';
 import 'package:flavorbox/presentation/screens/detail_screen.dart';
-import 'package:flavorbox/presentation/screens/form_screen.dart'; // Add this import
+import 'package:flavorbox/presentation/screens/form_screen.dart';
 import 'package:flutter/material.dart';
 
-import '../../data/services/json_service.dart';
-
 class HomeScreen extends StatefulWidget {
+  final GetRecipes getRecipes;
+  final AddRecipe addRecipe;
+  final DeleteRecipe deleteRecipe;
+
+  HomeScreen({
+    required this.getRecipes,
+    required this.addRecipe,
+    required this.deleteRecipe,
+  });
   @override
   _HomeScreenState createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> {
   late Future<List<Recipe>> _recipes;
-  List<Widget> cards = [];
-  int cardCount = 0;
-  late AddRecipe addRecipe;
-  late DeleteRecipe deleteRecipe;
 
   @override
   void initState() {
     super.initState();
-    // Inicializar con 15 tarjetas
-    // for (int i = 1; i <= 15; i++) {
-    //   cards.add(cardItem('Tarjeta $i', getColor(i)));
-    // }
-    final repository = RecipeRepositoryImpl(JsonService());
-    final getRecipes = GetRecipes(repository);
-    addRecipe = AddRecipe(repository);
-    deleteRecipe = DeleteRecipe(repository);
-    _recipes = getRecipes.call();
+    _recipes = widget.getRecipes.call();
+  }
+
+  void _loadRecipes() {
+    setState(() {
+      _recipes = widget.getRecipes.call();
+    });
   }
 
   Color getColor(int index) {
@@ -93,7 +93,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ),
                     Container(
-                      height: 40.0, // Espacio para el botón
+                      height: 40.0,
                     ),
                   ],
                 ),
@@ -137,31 +137,17 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
 
-    if (result != null) {
-      final newRecipe = Recipe(
-        id: DateTime.now().millisecondsSinceEpoch,
-        name: result['name'],
-        ingredients: result['ingredients'],
-        description: result['description'],
-      );
-      await addRecipe.call(newRecipe);
-      setState(() {
-        _recipes = GetRecipes(RecipeRepositoryImpl(JsonService())).call();
-      });
-    }
+    _loadRecipes();
   }
 
   Future<void> _deleteRecipe(int id) async {
-    await deleteRecipe.call(id);
-    setState(() {
-      _recipes = GetRecipes(RecipeRepositoryImpl(JsonService())).call();
-    });
+    _loadRecipes();
   }
 
   Widget cardItem(Recipe recipe, Color color) {
     return GestureDetector(
-      onTap: () {
-        Navigator.push(
+      onTap: () async {
+        await Navigator.push(
           context,
           MaterialPageRoute(
             builder: (context) => Detailscreen(
@@ -169,10 +155,12 @@ class _HomeScreenState extends State<HomeScreen> {
               name: recipe.name,
               ingredients: recipe.ingredients,
               description: recipe.description,
-              onDelete: _deleteRecipe,
             ),
           ),
         );
+
+        _loadRecipes();
+        _loadRecipes();
       },
       child: Card(
         shape: RoundedRectangleBorder(
@@ -180,7 +168,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         child: Container(
           width: double.infinity,
-          height: 150.0, // Aumentar la altura de la tarjeta
+          height: 150.0,
           margin: EdgeInsets.symmetric(vertical: 10.0),
           decoration: BoxDecoration(
             color: color.withOpacity(0.8),

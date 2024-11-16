@@ -1,3 +1,9 @@
+import 'package:flavorbox/data/repositories/recipe_repository_impl.dart';
+import 'package:flavorbox/data/services/json_service.dart';
+import 'package:flavorbox/domain/entities/recipe.dart';
+import 'package:flavorbox/domain/usecases/add_recipe.dart';
+import 'package:flavorbox/domain/usecases/delete_recipe.dart';
+import 'package:flavorbox/domain/usecases/edit_recipe.dart';
 import 'package:flavorbox/presentation/widgets/ingredient_card.dart';
 import 'package:flutter/material.dart';
 
@@ -5,17 +11,22 @@ class FormScreen extends StatefulWidget {
   final List<String> ingredients;
   final String description;
   final String name;
+  final int? id;
   late TextEditingController _nameController;
-  FormScreen(
-      {required this.ingredients,
-      required this.description,
-      required this.name});
+  FormScreen({
+    required this.ingredients,
+    required this.description,
+    required this.name,
+    this.id,
+  });
 
   @override
   _FormScreenState createState() => _FormScreenState();
 }
 
 class _FormScreenState extends State<FormScreen> {
+  late AddRecipe addRecipe;
+  late EditRecipe editRecipe;
   final _formKey = GlobalKey<FormState>();
   late List<String> _ingredients;
   late TextEditingController _nameController;
@@ -28,6 +39,9 @@ class _FormScreenState extends State<FormScreen> {
     _nameController = TextEditingController();
     _descriptionController = TextEditingController(text: widget.description);
     _nameController = TextEditingController(text: widget.name);
+    final repository = RecipeRepositoryImpl(JsonService());
+    addRecipe = AddRecipe(repository);
+    editRecipe = EditRecipe(repository);
   }
 
   void _showIngredientDialog({String? ingredient, int? index}) {
@@ -88,13 +102,27 @@ class _FormScreenState extends State<FormScreen> {
     });
   }
 
-  void _submitForm() {
+  Future<void> _submitForm() async {
     setState(() {
       _ingredientError =
-          _ingredients.isEmpty ? 'Ingredients cannot be empty' : null;
+          _ingredients.isEmpty ? 'Tiene que tener ingredientes' : null;
     });
 
     if (_formKey.currentState!.validate() && _ingredientError == null) {
+      final newRecipe = Recipe(
+        id: widget.id == null
+            ? DateTime.now().millisecondsSinceEpoch
+            : widget.id,
+        name: _nameController.text,
+        ingredients: _ingredients,
+        description: _descriptionController.text,
+      );
+      if (widget.id == null) {
+        await addRecipe.call(newRecipe);
+      } else {
+        await editRecipe.call(newRecipe);
+      }
+
       Navigator.pop(context, {
         'name': _nameController.text,
         'ingredients': _ingredients,

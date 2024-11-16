@@ -29,4 +29,15 @@ class RecipeRepositoryImpl implements RecipeRepository {
   Future<void> deleteRecipe(int id) async {
     await jsonService.deleteRecipe(id);
   }
+
+  @override
+  Future<void> editRecipe(Recipe recipe) async {
+    final recipeModel = RecipeModel(
+      id: recipe.id ?? 0,
+      name: recipe.name,
+      ingredients: recipe.ingredients,
+      description: recipe.description,
+    );
+    await jsonService.updateRecipe(recipeModel);
+  }
 }

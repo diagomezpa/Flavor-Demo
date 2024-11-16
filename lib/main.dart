@@ -1,12 +1,34 @@
+import 'package:flavorbox/data/repositories/recipe_repository_impl.dart';
+import 'package:flavorbox/data/services/json_service.dart';
+import 'package:flavorbox/domain/usecases/add_recipe.dart';
+import 'package:flavorbox/domain/usecases/delete_recipe.dart';
+import 'package:flavorbox/domain/usecases/get_recipes.dart';
 import 'package:flavorbox/presentation/screens/home_screen.dart';
 import 'package:flutter/material.dart';
 
 void main() {
-  runApp(const MyApp());
+  final repository = RecipeRepositoryImpl(JsonService());
+  final getRecipes = GetRecipes(repository);
+  final addRecipe = AddRecipe(repository);
+  final deleteRecipe = DeleteRecipe(repository);
+
+  runApp(MyApp(
+    getRecipes: getRecipes,
+    addRecipe: addRecipe,
+    deleteRecipe: deleteRecipe,
+  ));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final GetRecipes getRecipes;
+  final AddRecipe addRecipe;
+  final DeleteRecipe deleteRecipe;
+
+  MyApp({
+    required this.getRecipes,
+    required this.addRecipe,
+    required this.deleteRecipe,
+  });
 
   // This widget is the root of your application.
   @override
@@ -21,7 +43,11 @@ class MyApp extends StatelessWidget {
           bodyLarge: TextStyle(fontSize: 16.0),
         ),
       ),
-      home: HomeScreen(),
+      home: HomeScreen(
+        getRecipes: getRecipes,
+        addRecipe: addRecipe,
+        deleteRecipe: deleteRecipe,
+      ),
     );
   }
 }

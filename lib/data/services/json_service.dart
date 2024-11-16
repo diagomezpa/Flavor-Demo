@@ -48,4 +48,15 @@ class JsonService {
     final updatedRecipes = recipes.where((recipe) => recipe.id != id).toList();
     await saveRecipes(updatedRecipes);
   }
+
+  Future<void> updateRecipe(RecipeModel updatedRecipe) async {
+    final recipes = await fetchRecipes();
+    final index = recipes.indexWhere((recipe) => recipe.id == updatedRecipe.id);
+    if (index != -1) {
+      recipes[index] = updatedRecipe;
+      await saveRecipes(recipes);
+    } else {
+      throw Exception('No encuentro la receta con id ${updatedRecipe.id}');
+    }
+  }
 }
