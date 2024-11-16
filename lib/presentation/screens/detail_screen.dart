@@ -235,8 +235,8 @@ class _DetailscreenState extends State<Detailscreen> {
             ),
             SizedBox(height: 16), // Espacio vertical
             ElevatedButton.icon(
-              onPressed: () {
-                _handleDelete();
+              onPressed: () async {
+                await _handleDelete();
                 Navigator.pop(context);
               },
               icon: Icon(Icons.delete, color: Colors.black),
