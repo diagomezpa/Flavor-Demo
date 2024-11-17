@@ -31,6 +31,12 @@ class JsonService {
     }
   }
 
+  Future<RecipeModel> fetchRecipe(int id) async {
+    final recipes = await fetchRecipes();
+    final recipe = recipes.firstWhere((recipe) => recipe.id == id);
+    return recipe;
+  }
+
   Future<void> saveRecipes(List<RecipeModel> recipes) async {
     final file = await _getFile();
     final jsonData = recipes.map((recipe) => recipe.toMap()).toList();

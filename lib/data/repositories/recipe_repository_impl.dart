@@ -14,6 +14,11 @@ class RecipeRepositoryImpl implements RecipeRepository {
     return recipes;
   }
 
+  Future<Recipe> getRecipe(int id) async {
+    final recipe = await jsonService.fetchRecipe(id);
+    return recipe;
+  }
+
   @override
   Future<void> addRecipe(Recipe recipe) async {
     final recipeModel = RecipeModel(
