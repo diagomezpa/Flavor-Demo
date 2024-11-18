@@ -126,40 +126,24 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _addNewRecipe() async {
-    final result = await Navigator.push(
+    final result = await Navigator.pushNamed(
       context,
-      MaterialPageRoute(
-        builder: (context) => FormScreen(
-          ingredients: [],
-          description: '',
-          name: '',
-        ),
-      ),
+      '/form',
+      arguments: {'id': null},
     );
 
-    _loadRecipes();
-  }
-
-  Future<void> _deleteRecipe(int id) async {
     _loadRecipes();
   }
 
   Widget cardItem(Recipe recipe, Color color) {
     return GestureDetector(
       onTap: () async {
-        await Navigator.push(
+        await Navigator.pushNamed(
           context,
-          MaterialPageRoute(
-            builder: (context) => Detailscreen(
-              id: recipe.id!,
-              name: recipe.name,
-              ingredients: recipe.ingredients,
-              description: recipe.description,
-            ),
-          ),
+          '/detail',
+          arguments: {'id': recipe.id},
         );
 
-        _loadRecipes();
         _loadRecipes();
       },
       child: Card(

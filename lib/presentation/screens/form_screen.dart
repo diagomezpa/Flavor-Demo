@@ -4,20 +4,19 @@ import 'package:flavorbox/domain/entities/recipe.dart';
 import 'package:flavorbox/domain/usecases/add_recipe.dart';
 import 'package:flavorbox/domain/usecases/delete_recipe.dart';
 import 'package:flavorbox/domain/usecases/edit_recipe.dart';
+import 'package:flavorbox/domain/usecases/get_recipe.dart';
 import 'package:flavorbox/presentation/widgets/ingredient_card.dart';
 import 'package:flutter/material.dart';
 
 class FormScreen extends StatefulWidget {
-  final List<String> ingredients;
-  final String description;
-  final String name;
-  final int? id;
-  late TextEditingController _nameController;
+  final AddRecipe addRecipe;
+  final EditRecipe editRecipe;
+  final GetRecipe getRecipe;
+
   FormScreen({
-    required this.ingredients,
-    required this.description,
-    required this.name,
-    this.id,
+    required this.getRecipe,
+    required this.addRecipe,
+    required this.editRecipe,
   });
 
   @override
@@ -25,23 +24,47 @@ class FormScreen extends StatefulWidget {
 }
 
 class _FormScreenState extends State<FormScreen> {
-  late AddRecipe addRecipe;
-  late EditRecipe editRecipe;
   final _formKey = GlobalKey<FormState>();
   late List<String> _ingredients;
   late TextEditingController _nameController;
   late TextEditingController _descriptionController;
+  late Recipe recipe;
   String? _ingredientError;
+  late int? id;
+  bool _isInitialized = false;
   @override
   void initState() {
     super.initState();
-    _ingredients = List.from(widget.ingredients);
     _nameController = TextEditingController();
-    _descriptionController = TextEditingController(text: widget.description);
-    _nameController = TextEditingController(text: widget.name);
-    final repository = RecipeRepositoryImpl(JsonService());
-    addRecipe = AddRecipe(repository);
-    editRecipe = EditRecipe(repository);
+    _descriptionController = TextEditingController();
+    _ingredients = [];
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_isInitialized) {
+      _initializeForm();
+      _isInitialized = true;
+    }
+  }
+
+  void _initializeForm() {
+    final Map<String, dynamic> args =
+        ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+    id = args['id'] ?? null;
+    if (id != null) {
+      widget.getRecipe.call(args['id']).then((recipe) {
+        setState(() {
+          this.recipe = recipe;
+          _ingredients = List.from(recipe.ingredients);
+          _descriptionController.text = recipe.description;
+          _nameController.text = recipe.name;
+        });
+      });
+    } else {
+      _ingredients = [];
+    }
   }
 
   void _showIngredientDialog({String? ingredient, int? index}) {
@@ -110,17 +133,15 @@ class _FormScreenState extends State<FormScreen> {
 
     if (_formKey.currentState!.validate() && _ingredientError == null) {
       final newRecipe = Recipe(
-        id: widget.id == null
-            ? DateTime.now().millisecondsSinceEpoch
-            : widget.id,
+        id: id == null ? DateTime.now().millisecondsSinceEpoch : id,
         name: _nameController.text,
         ingredients: _ingredients,
         description: _descriptionController.text,
       );
-      if (widget.id == null) {
-        await addRecipe.call(newRecipe);
+      if (id == null) {
+        await widget.addRecipe.call(newRecipe);
       } else {
-        await editRecipe.call(newRecipe);
+        await widget.editRecipe.call(newRecipe);
       }
 
       Navigator.pop(context, {

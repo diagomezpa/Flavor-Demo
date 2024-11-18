@@ -6,7 +6,7 @@ class GetRecipe {
 
   GetRecipe(this.repository);
 
-  Future<List<Recipe>> call() async {
-    return await repository.getRecipes();
+  Future<Recipe> call(int id) async {
+    return await repository.getRecipe(id);
   }
 }

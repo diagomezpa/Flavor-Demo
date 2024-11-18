@@ -1,21 +1,19 @@
 import 'package:flavorbox/data/repositories/recipe_repository_impl.dart';
 import 'package:flavorbox/data/services/json_service.dart';
+import 'package:flavorbox/domain/entities/recipe.dart';
 import 'package:flavorbox/domain/usecases/delete_recipe.dart';
+import 'package:flavorbox/domain/usecases/get_recipe.dart';
 import 'package:flutter/material.dart';
 import 'form_screen.dart'; // Importa la pantalla de formulario
 import 'package:flavorbox/presentation/widgets/ingredient_card.dart';
 
 class Detailscreen extends StatefulWidget {
-  final String name;
-  final List<String> ingredients;
-  final String description;
-  final int id;
+  final GetRecipe getRecipe;
+  final DeleteRecipe deleteRecipe;
 
   Detailscreen({
-    required this.id,
-    required this.name,
-    required this.ingredients,
-    required this.description,
+    required this.deleteRecipe,
+    required this.getRecipe,
   });
 
   @override
@@ -23,90 +21,70 @@ class Detailscreen extends StatefulWidget {
 }
 
 class _DetailscreenState extends State<Detailscreen> {
-  late TextEditingController _descriptionController;
+  late int id;
+  late Recipe recipe;
+  late List<String> _ingredients;
   late TextEditingController _nameController;
-
-  late RecipeRepositoryImpl repository;
-  late DeleteRecipe deleteRecipe;
+  late TextEditingController _descriptionController;
+  bool _isInitialized = false;
 
   @override
   void initState() {
     super.initState();
-    _descriptionController = TextEditingController(text: widget.description);
-    _nameController = TextEditingController(text: widget.name);
-    repository = RecipeRepositoryImpl(JsonService());
-    deleteRecipe = DeleteRecipe(repository);
+    _nameController = TextEditingController();
+    _descriptionController = TextEditingController();
+    _ingredients = [];
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    super.didChangeDependencies();
+    if (!_isInitialized) {
+      _initializeForm();
+      _isInitialized = true;
+    }
+  }
+
+  void _initializeForm() {
+    final Map<String, dynamic> args =
+        ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+    id = args['id'] ?? null;
+    if (id != null) {
+      widget.getRecipe.call(args['id']).then((recipe) {
+        setState(() {
+          this.recipe = recipe;
+          _ingredients = List.from(recipe.ingredients);
+          _descriptionController.text = recipe.description;
+          _nameController.text = recipe.name;
+        });
+      });
+    } else {
+      _ingredients = [];
+    }
   }
 
   Future<void> _handleDelete() async {
     // Llama al caso de uso de eliminación
-    await deleteRecipe.call(widget.id);
-  }
-
-  void _showIngredientDialog({String? ingredient}) {
-    final TextEditingController ingredientController = TextEditingController(
-      text: ingredient ?? '',
-    );
-
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(ingredient == null
-              ? 'Agregar Ingrediente'
-              : 'Editar Ingrediente'),
-          content: TextField(
-            controller: ingredientController,
-            decoration: InputDecoration(hintText: 'Ingrese el ingrediente'),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text('Cancelar'),
-            ),
-            TextButton(
-              onPressed: () {
-                setState(() {
-                  if (ingredient == null) {
-                    widget.ingredients.add(ingredientController.text);
-                  } else {
-                    int index = widget.ingredients.indexOf(ingredient);
-                    if (index != -1) {
-                      widget.ingredients[index] = ingredientController.text;
-                    }
-                  }
-                });
-                Navigator.of(context).pop();
-              },
-              child: Text(ingredient == null ? 'Agregar' : 'Guardar'),
-            ),
-          ],
-        );
-      },
-    );
+    await widget.deleteRecipe.call(id);
   }
 
   void _editDetails() async {
-    final result = await Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => FormScreen(
-          id: widget.id,
-          name: _nameController.text,
-          ingredients: widget.ingredients,
-          description: _descriptionController.text,
-        ),
-      ),
+    final result = await Navigator.of(context).pushNamed(
+      '/form',
+      arguments: {
+        'id': id,
+      },
     );
-
     if (result != null) {
-      setState(() {
-        widget.ingredients
-          ..clear()
-          ..addAll(result['ingredients']);
-        _descriptionController.text = result['description'];
-        _nameController.text = result['name'];
+      widget.getRecipe.call(id).then((recipe) {
+        setState(() {
+          this.recipe = recipe;
+          _descriptionController.text = recipe.description;
+          _nameController.text = recipe.name;
+          _ingredients = List.from(recipe.ingredients);
+        });
       });
     }
   }
@@ -188,25 +166,10 @@ class _DetailscreenState extends State<Detailscreen> {
                         child: ListView(
                           scrollDirection: Axis.horizontal,
                           children: [
-                            ...widget.ingredients
-                                .map((ingredient) => GestureDetector(
-                                      onTap: () {
-                                        _showIngredientDialog(
-                                            ingredient: ingredient);
-                                      },
-                                      child: IngredientCard(name: ingredient),
-                                    ))
+                            ..._ingredients
+                                .map((ingredient) =>
+                                    IngredientCard(name: ingredient))
                                 .toList(),
-                            GestureDetector(
-                              onTap: _showIngredientDialog,
-                              child: Card(
-                                color: Colors.teal,
-                                child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Icon(Icons.add, color: Colors.white),
-                                ),
-                              ),
-                            ),
                           ],
                         ),
                       ),
