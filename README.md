@@ -1,37 +1,75 @@
-# FlavorBox
+# FlavorBox  
 
-FlavorBox es una aplicación Flutter diseñada para gestionar recetas. Los usuarios pueden agregar, ver, editar y eliminar recetas. Cada receta contiene un nombre, una lista de ingredientes y una descripción.
+**FlavorBox** es una aplicación Flutter diseñada para gestionar recetas. Permite a los usuarios agregar, ver, editar y eliminar recetas. Cada receta contiene un nombre, una lista de ingredientes y una descripción.  
 
-## Estructura del Proyecto
+## **Estructura del Proyecto**  
 
-- **models**: Contiene la clase modelo `Recipe`.
-- **services**: Contiene la clase `DatabaseHelper` para operaciones de base de datos.
-- **screens**: Contiene las pantallas de la interfaz de usuario como `HomeScreen`, `DetailScreen` y `FormScreen`.
+El proyecto sigue una arquitectura limpia, separando las responsabilidades en capas:  
 
-## Descripción del Diseño
+### **1. Data**  
+Esta capa contiene las implementaciones específicas de la fuente de datos, como modelos, servicios y repositorios.  
+- **`models`**: Define los modelos de datos utilizados en la aplicación, como `recipe_model.dart`.  
+- **`services`**: Implementa servicios para manejar datos. Actualmente se usa `json_service.dart` para simular operaciones CRUD con un archivo JSON.  
+- **`repositories`**: Implementa los repositorios que interactúan con la fuente de datos.  
 
-### Modelos
+### **2. Domain**  
+Esta capa define la lógica de negocio de la aplicación.  
+- **`entities`**: Contiene entidades puras que representan objetos del dominio, como `recipe.dart`.  
+- **`usecases`**: Define los casos de uso de la aplicación, como agregar, eliminar, editar y obtener recetas.  
+- **`repositories`**: Define las interfaces que aseguran que la capa de dominio no dependa de implementaciones específicas.  
 
-- **Recipe**: Representa una receta con un ID, nombre, ingredientes y descripción. Incluye métodos para convertir a y desde un mapa para operaciones de base de datos.
+### **3. Presentation**  
+Esta capa gestiona la interfaz de usuario.  
+- **`screens`**: Contiene las pantallas principales de la aplicación, como `home_screen.dart`, `detail_screen.dart` y `form_screen.dart`.  
+- **`widgets`**: Incluye componentes reutilizables, como `ingredient_card.dart`.  
 
-### Servicios
+### **4. Main**  
+El archivo `main.dart` es el punto de entrada de la aplicación.  
 
-- **DatabaseHelper**: Gestiona la base de datos SQLite. Incluye métodos para inicializar la base de datos, crear tablas, insertar, obtener y eliminar recetas.
+## **Características Principales**  
 
-### Pantallas
+1. **Agregar Recetas**  
+   - Navega a la pantalla de formulario para agregar una nueva receta con un nombre, ingredientes y descripción.  
 
-- **HomeScreen**: Muestra una lista de recetas. Los usuarios pueden agregar una nueva receta usando un botón que navega a la `FormScreen`.
-- **DetailScreen**: Muestra los detalles de una receta seleccionada. Los usuarios pueden editar o eliminar la receta.
-- **FormScreen**: Permite a los usuarios ingresar o editar los detalles de la receta, incluyendo el nombre, ingredientes y descripción.
+2. **Ver Detalles de Recetas**  
+   - Explora los detalles completos de cada receta desde la pantalla principal.  
 
-## Consideraciones Importantes
+3. **Editar Recetas**  
+   - Modifica las recetas existentes desde la pantalla de detalles.  
 
-1. **Inicialización de la Base de Datos**: La base de datos se inicializa de manera perezosa cuando se accede por primera vez. La clase `DatabaseHelper` asegura que se use una única instancia de la base de datos en toda la aplicación.
+4. **Eliminar Recetas**  
+   - Borra recetas no deseadas con un solo clic desde la pantalla de detalles.  
 
+## **Consideraciones Técnicas**  
 
-2. **Gestión del Estado**: El estado de la lista de recetas se gestiona usando `FutureBuilder` en la `HomeScreen`. Cuando se agrega o elimina una receta, el estado se actualiza para reflejar los cambios.
-3. **Navegación**: La navegación entre pantallas se maneja usando `Navigator.push` y `Navigator.pop`. Los datos se pasan entre pantallas usando el mecanismo de resultado del `Navigator`.
-4. **Gestión de Ingredientes**: Los ingredientes se gestionan como una lista de cadenas. Se muestran en una lista horizontal y se pueden agregar, editar o eliminar usando diálogos.
+1. **Gestión de Datos**  
+   - Los datos se manejan a través de un servicio que utiliza un archivo JSON para simular una base de datos. Esto asegura la flexibilidad y permite realizar operaciones CRUD sin depender de SQLite.  
+
+2. **Arquitectura Limpia**  
+   - La aplicación está organizada en capas (Data, Domain, Presentation) para mantener un bajo acoplamiento y alta cohesión, mejorando la escalabilidad y mantenibilidad.  
+
+3. **Gestión de Estado**  
+   - El estado de la lista de recetas se actualiza utilizando los casos de uso y la arquitectura limpia.  
+
+4. **Validación de Datos**  
+   - Se incluyen validaciones básicas en el formulario para evitar registros vacíos o incompletos.  
+
+5. **Navegación**  
+   - Se implementa una navegación limpia, centralizando rutas y evitando acoplar widgets con resultados directos de navegación.  
+
+## **Ejecución del Proyecto**  
+
+### **Requisitos Previos**  
+- Flutter SDK 3.x instalado en tu máquina.  
+- Editor de código como Visual Studio Code o Android Studio.  
+
+### **Instrucciones para Configuración**  
+1. Clona este repositorio en tu máquina local:  
+   ```bash  
+   git clone https://github.com/tu-usuario/flavorbox.git  
+   cd flavorbox  
+   flutter run  
+  ```
 
 ## Uso
 ![homeScreenListado](assets/listado.jpeg)
@@ -43,8 +81,3 @@ FlavorBox es una aplicación Flutter diseñada para gestionar recetas. Los usuar
 ![Detalles](assets/detalle.jpeg)
 3. **Editar una Receta**: En la `DetailScreen`, toca el botón "Editar" para navegar a la `FormScreen` con detalles prellenados.
 4. **Eliminar una Receta**: En la `DetailScreen`, toca el botón "Eliminar" para eliminar la receta y regresar a la `HomeScreen`.
-
-## Dependencias
-
-- `sqflite`: Para operaciones de base de datos SQLite.
-- `path`: Para manejar rutas de archivos.
