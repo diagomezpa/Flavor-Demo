@@ -57,6 +57,16 @@ El archivo `main.dart` es el punto de entrada de la aplicación.
 5. **Navegación**  
    - Se implementa una navegación limpia, centralizando rutas y evitando acoplar widgets con resultados directos de navegación.  
 
+## Uso
+![homeScreenListado](assets/listado.jpeg)
+
+![Formaulario](assets/agregar_receta.jpeg)
+1. **Agregar una Receta**: Toca el botón "Agregar Nueva Receta" en la `HomeScreen` para navegar a la `FormScreen`. Llena los detalles y guarda.
+![homeScreen](assets/sin_receta.jpeg)
+2. **Ver Detalles de la Receta**: Toca una tarjeta de receta en la `HomeScreen` para navegar a la `DetailScreen`.
+![Detalles](assets/detalle.jpeg)
+3. **Editar una Receta**: En la `DetailScreen`, toca el botón "Editar" para navegar a la `FormScreen` con detalles prellenados.
+4. **Eliminar una Receta**: En la `DetailScreen`, toca el botón "Eliminar" para eliminar la receta y regresar a la `HomeScreen`.
 ## **Ejecución del Proyecto**  
 
 ### **Requisitos Previos**  
@@ -71,13 +81,3 @@ El archivo `main.dart` es el punto de entrada de la aplicación.
    flutter run  
   ```
 
-## Uso
-![homeScreenListado](assets/listado.jpeg)
-
-![Formaulario](assets/agregar_receta.jpeg)
-1. **Agregar una Receta**: Toca el botón "Agregar Nueva Receta" en la `HomeScreen` para navegar a la `FormScreen`. Llena los detalles y guarda.
-![homeScreen](assets/sin_receta.jpeg)
-2. **Ver Detalles de la Receta**: Toca una tarjeta de receta en la `HomeScreen` para navegar a la `DetailScreen`.
-![Detalles](assets/detalle.jpeg)
-3. **Editar una Receta**: En la `DetailScreen`, toca el botón "Editar" para navegar a la `FormScreen` con detalles prellenados.
-4. **Eliminar una Receta**: En la `DetailScreen`, toca el botón "Eliminar" para eliminar la receta y regresar a la `HomeScreen`.
